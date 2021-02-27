@@ -1,0 +1,28 @@
+*{
+    box-sizing: border-box;
+}
+html,body{
+    width: 100%;
+    height: 100%;
+}
+main{
+    width: 100%;
+    height: 100%;
+}
+main.flex-center{
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+}
+star-rating{
+    display: block;
+}
+star-rating .star-rating-container{
+    display: flex;
+}
+star-rating .star{
+    cursor: auto;
+}
+star-rating.edit .star{
+    cursor: pointer;
+}
