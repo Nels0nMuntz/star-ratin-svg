@@ -54,7 +54,7 @@ class Star {
                     <stop offset="0%" stop-color="#C31F97" />
                     <stop offset="100%" stop-color="#5090E7" />
                 </linearGradient>
-                ${percent ? (`
+                ${percent !== undefined ? (`
                     <linearGradient id="grad-specific" x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0%" stop-color="#fff" stop-opacity="0"  />
                         <stop offset="${percent}%" stop-color="#fff" stop-opacity="0" />
@@ -110,14 +110,14 @@ class StarRating extends HTMLElement {
         this._stars = [];
         this._starContainer = null;
         this.initialize();
-        this.draw(this.rating);
+        this.draw();
     };
     get count() { return this._count }
     get rating() { return this._rating }
     get editMode() { return this._editMode }
     get gap() { return this._gap }
-    set count(value) { this._count = value }
-    set rating(value) { this._rating = value }
+    set count(value) { this._count = value || 5 }
+    set rating(value) { this._rating = value || 0 }
     set editMode(value) {
         if (value === "true") {
             this._editMode = true;
@@ -131,35 +131,42 @@ class StarRating extends HTMLElement {
     set gap(value) {
         this._gap = !!value && !!parseInt(value) ? value : "0";
     }
-    initialize() {
-        const stars = parseInt(this.getAttribute("stars"));
-        const rating = parseFloat(this.getAttribute("rating"));
-        const editMode = this.getAttribute("edit-mode");
-        const gap = this.getAttribute("gap");
-        this.count = stars ? stars : 5;
-        this.rating = rating ? rating : 0;
+    initialize(initValues = {}) {
+        const { _stars, _rating, _editMode, _gap } = initValues;
+        const stars = _stars || parseInt(this.getAttribute("stars"));
+        const rating = _rating || parseFloat(this.getAttribute("rating"));
+        const editMode = _editMode || this.getAttribute("edit-mode");
+        const gap = _gap || this.getAttribute("gap");
+        this.count = stars;
+        this.rating = rating;
         this.editMode = editMode;
         this.gap = gap;
 
-        const starContainer = document.createElement("div");
-        starContainer.classList.add("star-rating-container");
-        this.style.padding = `${this._consts.PADDING_OUT}px`;
-        this.append(starContainer);
-        this._starContainer = starContainer;
-
+        if (!this._starContainer) {
+            const starContainer = document.createElement("div");
+            starContainer.classList.add("star-rating-container");
+            this.style.padding = `${this._consts.PADDING_OUT}px`;
+            this.append(starContainer);
+            this._starContainer = starContainer;
+        }
         if (this.editMode) {
             this.rating = 0;
             this.addMouseListeners();
             this.classList.add("edit");
-        };
+        }
+        if(!this.editMode){
+            this.removeMouseListeners()
+            this.classList.remove("edit");
+        }
     }
-    fill(index) {
+    fill() {
         this._stars = [];
+        const rating = this.rating;
         for (let i = 0; i < this.count; i++) {
 
-            const integer = Math.trunc(index);
-            const rest = (index - Math.trunc(index));
-            const sin = Math.asin(2 * rest - 1) / Math.PI + 0.5;
+            const integer = Math.trunc(rating);
+            const rest = (rating - Math.trunc(rating));
+            const sin = Math.asin(2 * rest - 1) / (0.5 * Math.PI) + 0.5;
             const percent = Math.round(sin * 100);
 
             const star = document.createElement('div');
@@ -171,7 +178,7 @@ class StarRating extends HTMLElement {
                 star.innerHTML = this._starSVG.getFullStar();
             }
             else if (i === integer) {
-                if (index === integer) {
+                if (rating === integer) {
                     star.innerHTML = this._starSVG.getEmptyStar();
                 } else {
                     star.innerHTML = this._starSVG.getSpecificStar(percent);
@@ -190,31 +197,53 @@ class StarRating extends HTMLElement {
         };
     }
     clear() { this._starContainer.innerHTML = '' }
-    draw(index) {
-        this.fill(index);
+    draw() {
+        this.fill();
         this.render();
     }
     addMouseListeners() {
+        this._starContainer.addEventListener("mousedown", this._handlers.handleMouseClick);
         this._starContainer.addEventListener('mousemove', this._handlers.handleMouseMove);
         this.addEventListener("mouseleave", this._handlers.handleMouseLeave);
     }
     removeMouseListeners() {
+        this._starContainer.removeEventListener("mousedown", this._handlers.handleMouseClick);
         this._starContainer.removeEventListener('mousemove', this._handlers.handleMouseMove);
-        this._starContainer.removeEventListener("mouseleave", this._handlers.handleMouseLeave);
+        this.removeEventListener("mouseleave", this._handlers.handleMouseLeave);
     }
     _handlers = {
         handleMouseMove: e => {
             const box = this._starContainer.getBoundingClientRect();
-            const starIndex = Math.ceil((e.pageX - box.left - this._consts.KORRECTOR) / (box.width) * this._stars.length);
-            this.draw(starIndex);
+            const starIndex = (e.pageX - box.left - this._consts.KORRECTOR) / (box.width) * this._stars.length;
+            const rounded = +(starIndex.toFixed(3));
+            this.rating = rounded;
+            this.draw();
+            this.dispatchEvent(this._events.change);
         },
-        handleMouseLeave: () => this.draw(0),
+        handleMouseLeave: () => {
+            this.rating = 0;
+            this.draw();
+            this.dispatchEvent(this._events.change);
+        },
+        handleMouseClick: e => {
+            const box = this._starContainer.getBoundingClientRect();
+            const starIndex = (e.pageX - box.left - this._consts.KORRECTOR) / (box.width) * this._stars.length;
+            const rounded = +(starIndex.toFixed(3));
+            this.rating = rounded;
+            this.initialize({ _rating: rounded, _editMode: "false" });
+            this.draw();
+            this.dispatchEvent(this._events.select);
+        },
+    }
+    _events = {
+        change: new Event("onChange", ),
+        select: new Event("onSelect"),        
     }
     _consts = {
-        KORRECTOR: 5,
+        KORRECTOR: 6,
         PADDING_OUT: 10,
     }
 };
-window.customElements.define('star-rating', StarRating);
+customElements.define('star-rating', StarRating);
 
 

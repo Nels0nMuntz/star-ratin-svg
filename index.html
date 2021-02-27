@@ -11,15 +11,32 @@
 
 <body>
 
+
     <main class="flex-center">
         <div class="rating-wrapper">
 
-            <star-rating stars="10" rating="2.5" gap="20" edit-mode="true"></star-rating>
+            <star-rating 
+                id="custom-star-rating"
+                edit-mode="true"
+                stars="10" 
+                rating="2.5" 
+                gap="5" 
+            ></star-rating>
 
+        </div>
+
+        <div id="digits" class="digits">
+            Rating
         </div>
     </main>
 
     <script src="script.js"></script>
+    <script>
+        const starRating = document.getElementById("custom-star-rating");
+        const digits = document.getElementById("digits");
+        starRating.addEventListener("onChange", () => digits.innerHTML = starRating.rating.toFixed(2));
+        starRating.addEventListener("onSelect", () => digits.innerHTML = starRating.rating.toFixed(2));
+    </script>
 </body>
 
 </html>
