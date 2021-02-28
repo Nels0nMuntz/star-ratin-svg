@@ -13,29 +13,26 @@
 
 
     <main class="flex-center">
-        <div class="rating-wrapper">
-
-            <star-rating 
-                id="custom-star-rating"
-                edit-mode="true"
-                stars="10" 
-                rating="2.5" 
-                gap="5" 
-            ></star-rating>
-
-        </div>
-
-        <div id="digits" class="digits">
-            Rating
-        </div>
+        <div id="rating-wrapper" class="rating-wrapper"></div>
+        <div id="display" class="digits">Rating</div>
+        <button id="change-mode-btn" class="change-mode-btn" type="button">Change Mode</button>
     </main>
 
-    <script src="script.js"></script>
+    <script src="./star-rating.js"></script>
     <script>
-        const starRating = document.getElementById("custom-star-rating");
-        const digits = document.getElementById("digits");
-        starRating.addEventListener("onChange", () => digits.innerHTML = starRating.rating.toFixed(2));
-        starRating.addEventListener("onSelect", () => digits.innerHTML = starRating.rating.toFixed(2));
+        document.addEventListener("DOMContentLoaded", () => {
+            const { rating, setEditMode, getEditMode } = defineStarRating({
+                stars: 5,
+                rating: 2.5,
+                gap: 5,
+                editMode: false,
+                ratingSelector: "#rating-wrapper",
+                displaySelector: "#display",
+            });
+
+            const button = document.getElementById("change-mode-btn");
+            button.addEventListener("click", () => setEditMode(!getEditMode()))
+        });
     </script>
 </body>
 
