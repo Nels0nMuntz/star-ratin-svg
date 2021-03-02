@@ -49,17 +49,21 @@ main.flex-center{
     outline: none;
 }
 
-star-rating{
+/* star-rating{
     display: block;
-}
+} */
 star-rating .star-rating-container{
     display: flex;
+    /* outline: 1px solid steelblue; */
     /* margin: 0 -25px !important; */
 }
 star-rating .star{
     cursor: auto;
-    outline: 1px solid wheat;
+    /* outline: 1px solid wheat; */
 }
+/* star-rating .star svg path{
+    outline: 1px solid wheat;
+} */
 /* star-rating .star.star:first-child{
     margin-left: 0 !important;
 }
