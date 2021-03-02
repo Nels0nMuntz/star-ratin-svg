@@ -29,7 +29,7 @@ const defineStarRating = (function () {
                             d="M20 2.54029L24.0048 15.5001L24.1681 16.0286H24.7214H37.7828L27.184 24.1254L26.7683 24.443L26.9228 24.9428L30.9513 37.9795L20.4553 29.9613L20 29.6135L19.5447 29.9613L9.04867 37.9795L13.0772 24.9428L13.2317 24.443L12.816 24.1254L2.21722 16.0286H15.2786H15.8319L15.9952 15.5001L20 2.54029Z"
                             fill="${fillFront}" 
                             stroke="${fillStrocke}" 
-                            stroke-width="2" />
+                            stroke-width="1" />
                     </g>
                 </g>
             </svg>
@@ -118,13 +118,20 @@ const defineStarRating = (function () {
 
                 const integer = Math.trunc(rating);
                 const rest = (rating - Math.trunc(rating));
-                const sin = Math.asin(2 * rest - 1) / (0.5 * Math.PI) + 0.5;
+                // console.log(`rest: ${rest}`);
+                // const sin = rest;
+                const sin = (Math.asin(2 * rest - 1) / (0.5 * Math.PI) + 0.5);
+                // const sin = (0.5 * Math.cos(Math.PI * rest + Math.PI) + 0.5);
+                // const sin = 0.35 * Math.atan(4 * Math.PI * rest - 4 * Math.PI / 2) + 0.5
+                // console.log(`sin: ${sin}`);
                 const percent = Math.round(sin * 100);
 
                 const star = document.createElement('div');
                 star.classList.add('star');
-                star.style.paddingLeft = `${this.gap / 2}px`;
-                star.style.paddingRight = `${this.gap / 2}px`;
+                star.style.marginLeft = `${this.gap / 2}px`;
+                star.style.marginRight = `${this.gap / 2}px`;
+                // star.style.paddingLeft = `${this.gap / 2}px`;
+                // star.style.paddingRight = `${this.gap / 2}px`;
 
                 if (i < integer) {
                     star.innerHTML = this._starSVG.getFullStar();
@@ -166,7 +173,17 @@ const defineStarRating = (function () {
         _handlers = {
             handleMouseMove: e => {
                 const box = this._starContainer.getBoundingClientRect();
-                const starIndex = (e.pageX - box.left - this._consts.KORRECTOR) / (box.width) * this._stars.length;
+                const starIndex = (e.pageX - box.left) / (box.width) * this._stars.length;
+
+                if(starIndex >= this._count) starIndex = this._count - 1
+                const starIndexInt = Math.trunc(starIndex);
+                const svg = this._stars[starIndexInt].children[0].getBoundingClientRect();
+                // svg.getBoundingClientRect();
+
+                const newStarIndex = (e.pageX - svg.left) / (svg.width);
+                console.log(newStarIndex); 
+
+                // const rounded = +(starIndex.toFixed(3));
                 const rounded = +(starIndex.toFixed(3));
                 this.rating = rounded;
                 this.draw();
@@ -179,7 +196,7 @@ const defineStarRating = (function () {
             },
             handleMouseClick: e => {
                 const box = this._starContainer.getBoundingClientRect();
-                const starIndex = (e.pageX - box.left - this._consts.KORRECTOR) / (box.width) * this._stars.length;
+                const starIndex = (e.pageX - box.left) / (box.width) * this._stars.length;               
                 const rounded = +(starIndex.toFixed(3));
                 this.rating = rounded;
                 this._options = {
@@ -197,7 +214,7 @@ const defineStarRating = (function () {
             select: new Event("onSelect"),
         }
         _consts = {
-            KORRECTOR: 6,
+            // KORRECTOR: 0,
             PADDING_OUT: 10,
         }
     };

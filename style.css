@@ -54,10 +54,18 @@ star-rating{
 }
 star-rating .star-rating-container{
     display: flex;
+    /* margin: 0 -25px !important; */
 }
 star-rating .star{
     cursor: auto;
+    outline: 1px solid wheat;
 }
+/* star-rating .star.star:first-child{
+    margin-left: 0 !important;
+}
+star-rating .star.star:last-child{
+    margin-right: 0 !important;
+} */
 star-rating.edit .star{
     cursor: pointer;
 }
