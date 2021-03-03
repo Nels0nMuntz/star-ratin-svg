@@ -50,10 +50,13 @@ main.flex-center{
 .change-mode-btn:active{
     outline: none;
 }
-
+star-rating {
+    display: block;
+}
 star-rating .star-rating-container{
     display: flex;
     outline: 1px solid sandybrown;
+    padding: 10px;
 }
 star-rating .star{
     cursor: auto;

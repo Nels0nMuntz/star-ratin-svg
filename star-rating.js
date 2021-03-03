@@ -1,18 +1,25 @@
 const defineStarRating = (function () {
 
     class Star {
-        constructor({ size, colors }) { 
+        constructor({ size, colors }) {
             this.size = size || 20,
-            this.colors = colors ? colors.length ? colors : this.defaultColors : this.defaultColors
+                this.colors = colors ? colors.length ? colors : this.defaultColors : this.defaultColors
         }
-        defaultColors = [ "#C31F97", "#5090E7" ];
+        defaultColors = ["#C31F97", "#5090E7"];
         _getSVG({ fillStrocke, fillFront, fillBack, percent }) {
             return (` 
             <svg xmlns="http://www.w3.org/2000/svg" width="${this.size}" height="${this.size}" viewBox="0 0 80 80" fill="none">
                 <defs>
                     <linearGradient id="grad-full" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stop-color="#C31F97" />
-                        <stop offset="100%" stop-color="#5090E7" />
+                        ${this.colors.length === 1 ? (
+                    `
+                                    <stop offset="0%" stop-color=${this.colors[0]} />
+                                    <stop offset="100%" stop-color=${this.colors[0]} />
+                                `
+                ) : (
+                        this.colors.reduce((acc, color, index) => (acc + `<stop offset="${100 * index / (this.colors.length - 1)}%" stop-color=${color} />`), ``)
+                    )
+                }
                     </linearGradient>
                     ${percent !== undefined ? (`
                     <linearGradient id="grad-specific" x1="0" y1="0" x2="1" y2="0">
@@ -104,10 +111,6 @@ const defineStarRating = (function () {
             if (!this._starContainer) {
                 const starContainer = document.createElement("div");
                 starContainer.classList.add("star-rating-container");
-                starContainer.style.paddingTop = this._consts.PADDING + "px";
-                starContainer.style.paddingBottom = this._consts.PADDING + "px";
-                starContainer.style.paddingLeft = this._consts.PADDING + "px";
-                starContainer.style.paddingRight = this._consts.PADDING + "px";
                 this.append(starContainer);
                 this._starContainer = starContainer;
             }
@@ -179,7 +182,7 @@ const defineStarRating = (function () {
                 const box = this._starContainer.getBoundingClientRect();
                 const starIndex = (e.pageX - box.left) / (box.width) * this._stars.length;
                 const starIndexInt = starIndex < this.count ? Math.trunc(starIndex) : this.count - 1;
-                const svgBox = this._stars[starIndexInt].children[0].getBoundingClientRect();               
+                const svgBox = this._stars[starIndexInt].children[0].getBoundingClientRect();
                 if (e.pageX >= svgBox.left && e.pageX <= svgBox.right) {
                     const rateingPerStar = (e.pageX - svgBox.left) / svgBox.width + starIndexInt;
                     const rounded = +(rateingPerStar.toFixed(3));
