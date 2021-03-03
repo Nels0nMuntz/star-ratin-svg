@@ -20,12 +20,16 @@
 
     <script src="./star-rating.js"></script>
     <script>
-        // document.addEventListener("DOMContentLoaded", () => {
-            const { rating, setEditMode, getEditMode } = defineStarRating({
+        document.addEventListener("DOMContentLoaded", () => {
+            const { getRating, getEditMode, setEditMode } = defineStarRating({
                 stars: 5,
                 rating: 2.5,
                 gap: 20,
-                size: 40,
+                size: 80,
+                colors: [
+                    "#ffff2e",
+                    "#2eff2e"
+                ],
                 editMode: true,
                 ratingSelector: "#rating-wrapper",
                 displaySelector: "#display",
@@ -33,7 +37,7 @@
 
             const button = document.getElementById("change-mode-btn");
             button.addEventListener("click", () => setEditMode(!getEditMode()))
-        // });
+        });
     </script>
     
 </body>

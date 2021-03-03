@@ -1,12 +1,13 @@
 const defineStarRating = (function () {
 
     class Star {
-        constructor({ size }) { 
-            this.size = size
+        constructor({ size, colors }) { 
+            this.size = size || 20,
+            this.colors = colors ? colors.length ? colors : this.defaultColors : this.defaultColors
         }
+        defaultColors = [ "#C31F97", "#5090E7" ];
         _getSVG({ fillStrocke, fillFront, fillBack, percent }) {
-            return (`   
-
+            return (` 
             <svg xmlns="http://www.w3.org/2000/svg" width="${this.size}" height="${this.size}" viewBox="0 0 80 80" fill="none">
                 <defs>
                     <linearGradient id="grad-full" x1="0" y1="0" x2="1" y2="0">
@@ -32,7 +33,7 @@ const defineStarRating = (function () {
                             d="M40 2.76715L49.1775 26.4463L49.4105 27.0475L50.0543 27.0834L75.4105 28.4944L55.7263 44.54L55.2265 44.9474L55.3914 45.5708L61.8849 70.122L40.5419 56.3596L40 56.0101L39.4581 56.3596L18.1151 70.122L24.6086 45.5708L24.7735 44.9474L24.2737 44.54L4.58945 28.4944L29.9457 27.0834L30.5895 27.0475L30.8225 26.4463L40 2.76715Z"
                             fill="${fillFront}"
                             stroke="${fillStrocke}" 
-                            stroke-width="2" />
+                            stroke-width="4" />
                     </g>
                 </g>
             </svg>
@@ -67,7 +68,8 @@ const defineStarRating = (function () {
             super();
             this._options = options || {};
             this._starSVG = new Star({
-                size: this._options.size
+                size: this._options.size,
+                colors: this._options.colors
             });
             this._stars = [];
             this._starContainer = null;
@@ -96,14 +98,17 @@ const defineStarRating = (function () {
             const { stars: _stars, rating: _rating, gap: _gap, editMode: _editMode } = this._options;
             this.count = _stars;
             this.rating = _rating;
-            this.gap = _gap;
+            this.gap = _gap || 10;
             this.editMode = _editMode.toString();
 
             if (!this._starContainer) {
                 const starContainer = document.createElement("div");
                 starContainer.classList.add("star-rating-container");
-                this.style.padding = `${this._consts.PADDING_OUT}px`;
-                // this.append(starContainer);
+                starContainer.style.paddingTop = this._consts.PADDING + "px";
+                starContainer.style.paddingBottom = this._consts.PADDING + "px";
+                starContainer.style.paddingLeft = this._consts.PADDING + "px";
+                starContainer.style.paddingRight = this._consts.PADDING + "px";
+                this.append(starContainer);
                 this._starContainer = starContainer;
             }
             if (this.editMode) {
@@ -153,7 +158,6 @@ const defineStarRating = (function () {
             for (let i = 0; i < this._stars.length; i++) {
                 this._starContainer.append(this._stars[i]);
             };
-            this.append(this._starContainer);
         }
         clear() { this._starContainer.innerHTML = '' }
         draw() {
@@ -174,11 +178,8 @@ const defineStarRating = (function () {
             handleMouseMove: e => {
                 const box = this._starContainer.getBoundingClientRect();
                 const starIndex = (e.pageX - box.left) / (box.width) * this._stars.length;
-
                 const starIndexInt = starIndex < this.count ? Math.trunc(starIndex) : this.count - 1;
-                const svgBox = this._stars[starIndexInt].children[0].getBoundingClientRect();
-                
-
+                const svgBox = this._stars[starIndexInt].children[0].getBoundingClientRect();               
                 if (e.pageX >= svgBox.left && e.pageX <= svgBox.right) {
                     const rateingPerStar = (e.pageX - svgBox.left) / svgBox.width + starIndexInt;
                     const rounded = +(rateingPerStar.toFixed(3));
@@ -212,7 +213,7 @@ const defineStarRating = (function () {
             select: new Event("onSelect"),
         }
         _consts = {
-            PADDING_OUT: 10,
+            PADDING: 10,
         }
     };
     customElements.define('star-rating', StarRating);
@@ -232,7 +233,7 @@ const defineStarRating = (function () {
             starRating.addEventListener("onSelect", () => display.innerHTML = starRating.rating.toFixed(2));
         }
         return {
-            rating: starRating.rating,
+            getRating: () => starRating.rating,
             setEditMode: (value) => {
                 starRating._options = {
                     ...starRating._options,
