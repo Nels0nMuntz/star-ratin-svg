@@ -50,15 +50,22 @@ main.flex-center{
 .change-mode-btn:active{
     outline: none;
 }
+.rating-wrapper{
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
 star-rating {
     display: block;
+    width: 100%;
 }
 star-rating .star-rating-container{
     display: flex;
-    outline: 1px solid sandybrown;
-    padding: 10px;
+    justify-content: space-between;
+    width: 100%;    
 }
 star-rating .star{
+    flex-shrink: 0;
     cursor: auto;
 }
 star-rating.edit .star{

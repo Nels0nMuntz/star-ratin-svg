@@ -1,5 +1,4 @@
 const defineStarRating = (function () {
-
     class Star {
         constructor({ size, colors }) {
             this.size = size || 20,
@@ -69,7 +68,6 @@ const defineStarRating = (function () {
             });
         }
     }
-
     class StarRating extends HTMLElement {
         constructor(options) {
             super();
@@ -90,7 +88,7 @@ const defineStarRating = (function () {
         get gap() { return this._gap }
         set count(value) { this._count = value || 5 }
         set rating(value) { this._rating = value ? value > this.count ? this.count : value : 0 }
-        set gap(value) { this._gap = !!value && !!parseInt(value) ? value : "0" }
+        set gap(value) { this._gap = value === undefined ? "0" : parseInt(value) }
         set editMode(value) {
             if (value === "true") {
                 this._editMode = true;
@@ -105,12 +103,13 @@ const defineStarRating = (function () {
             const { stars: _stars, rating: _rating, gap: _gap, editMode: _editMode } = this._options;
             this.count = _stars;
             this.rating = _rating;
-            this.gap = _gap || 10;
+            this.gap = _gap;
             this.editMode = _editMode.toString();
 
             if (!this._starContainer) {
                 const starContainer = document.createElement("div");
                 starContainer.classList.add("star-rating-container");
+                starContainer.style.padding = this._consts.PADDING + "px";
                 this.append(starContainer);
                 this._starContainer = starContainer;
             }
@@ -132,7 +131,6 @@ const defineStarRating = (function () {
                 const integer = Math.trunc(rating);
                 const rest = (rating - Math.trunc(rating));
                 const sin = rest;
-                // const sin = (Math.asin(2 * rest - 1) / (0.5 * Math.PI) + 0.5);
                 const percent = Math.round(sin * 100);
 
                 const star = document.createElement('div');
@@ -179,13 +177,13 @@ const defineStarRating = (function () {
         }
         _handlers = {
             handleMouseMove: e => {
-                const box = this._starContainer.getBoundingClientRect();
-                const starIndex = (e.pageX - box.left) / (box.width) * this._stars.length;
-                const starIndexInt = starIndex < this.count ? Math.trunc(starIndex) : this.count - 1;
-                const svgBox = this._stars[starIndexInt].children[0].getBoundingClientRect();
-                if (e.pageX >= svgBox.left && e.pageX <= svgBox.right) {
-                    const rateingPerStar = (e.pageX - svgBox.left) / svgBox.width + starIndexInt;
-                    const rounded = +(rateingPerStar.toFixed(3));
+                const containerCoords = this._starContainer.getBoundingClientRect();
+                let starIndex = (e.pageX - containerCoords.left) / (containerCoords.width) * this._stars.length;
+                starIndex = starIndex < this.count ? Math.trunc(starIndex) : this.count - 1;
+                const svgCoords = this._stars[starIndex].children[0].getBoundingClientRect();
+                if (e.pageX >= svgCoords.left && e.pageX <= svgCoords.right) {
+                    const ratingPerStar = (e.pageX - svgCoords.left) / svgCoords.width + starIndex;
+                    const rounded = +(ratingPerStar.toFixed(3));
                     this.rating = rounded;
                     this.draw();
                     this.dispatchEvent(this._events.change);
@@ -197,13 +195,29 @@ const defineStarRating = (function () {
                 this.dispatchEvent(this._events.change);
             },
             handleMouseClick: e => {
-                const box = this._starContainer.getBoundingClientRect();
-                const starIndex = (e.pageX - box.left) / (box.width) * this._stars.length;
-                const rounded = +(starIndex.toFixed(3));
-                this.rating = rounded;
+                const containerCoords = this._starContainer.getBoundingClientRect();
+                let starIndex = (e.pageX - containerCoords.left) / (containerCoords.width) * this._stars.length;
+                starIndex = starIndex < this.count ? Math.trunc(starIndex) : this.count - 1;
+                const svgCoords = this._stars[starIndex].children[0].getBoundingClientRect();
+                if (e.pageX >= svgCoords.left && e.pageX <= svgCoords.right) {
+                    const ratingPerStar = (e.pageX - svgCoords.left) / svgCoords.width + starIndex;
+                    const rounded = +(ratingPerStar.toFixed(3));
+                    this.rating = rounded;
+                    this._options = {
+                        ...this._options,
+                        rating: rounded,
+                        editMode: false
+                    };
+                    this.initialize();
+                    this.draw();
+                    this.dispatchEvent(this._events.select);
+                    return;
+                }
+                else if (e.pageX > svgCoords.right) ++starIndex
+                this.rating = starIndex;
                 this._options = {
                     ...this._options,
-                    rating: rounded,
+                    rating: starIndex,
                     editMode: false
                 };
                 this.initialize();
@@ -244,6 +258,7 @@ const defineStarRating = (function () {
                 };
                 starRating.initialize();
                 starRating.draw();
+                starRating.dispatchEvent(starRating._events.select);
                 return starRating.editMode;
             },
             getEditMode: () => starRating.editMode,
