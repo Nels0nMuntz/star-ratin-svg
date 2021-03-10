@@ -195,11 +195,14 @@ class StarRating extends HTMLElement {
             const containerCoords = this._starContainer.getBoundingClientRect();
             let starIndex = (e.pageX - containerCoords.left) / (containerCoords.width) * this._stars.length;
             starIndex = starIndex < this.count ? Math.trunc(starIndex) : this.count - 1;
-            const svgCoords = this._stars[starIndex].children[0].getBoundingClientRect();
+            const svgCoords = this._stars[starIndex].children[0].getBoundingClientRect();            
+            const ratingPerStar = (e.pageX - svgCoords.left) / svgCoords.width + starIndex;
             if (e.pageX >= svgCoords.left && e.pageX <= svgCoords.right) {
-                const ratingPerStar = (e.pageX - svgCoords.left) / svgCoords.width + starIndex;
-                const rounded = +(ratingPerStar.toFixed(3));
-                this.rating = rounded;
+                this.rating = +(ratingPerStar.toFixed(3));
+                this.draw();
+                this.dispatchEvent(this._events.change);
+            }else{
+                this.rating = Math.round(ratingPerStar);
                 this.draw();
                 this.dispatchEvent(this._events.change);
             };
