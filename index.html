@@ -46,7 +46,7 @@
                     rating: 2.5,
                     size: 80,
                     gap: 0,
-                    editMode: true,
+                    editMode: false,
                     ratingSelector: "#rating-wrapper",
                 });
             }
@@ -57,14 +57,14 @@
                     rating: 3.5,
                     size: 80,
                     gap: 0,
-                    editMode: false,
+                    editMode: true,
                     ratingSelector: "#rating-wrapper-2",
                 });
             }
 
 
-            const button = document.getElementById("change-mode-btn");
-            button.addEventListener("click", () => setEditMode(!getEditMode()));
+            // const button = document.getElementById("change-mode-btn");
+            // button.addEventListener("click", () => setEditMode(!getEditMode()));
 
         });
     </script>

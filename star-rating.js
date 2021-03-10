@@ -1,7 +1,9 @@
 class Star {
     constructor({ size, colors }) {
-        this.size = size || 20,
-            this.colors = colors ? colors.length ? colors : this.defaultColors : this.defaultColors
+        this.size = size || 20;
+        this.colors = colors ? colors.length ? colors : this.defaultColors : this.defaultColors;
+        this.timestamp = +new Date();
+        console.log(this.timestamp);
     }
     defaultColors = ["#C31F97", "#5090E7"];
     _getSVG({ fillStrocke, fillFront, fillBack, percent }) {
@@ -20,7 +22,7 @@ class Star {
                 }
                     </linearGradient>
                     ${percent !== undefined ? (`
-                    <linearGradient id="grad-specific" x1="0" y1="0" x2="1" y2="0">
+                    <linearGradient id="grad-specific_${this.timestamp}" x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0%" stop-color="#fff" stop-opacity="0" />
                         <stop offset="${percent}%" stop-color="#fff" stop-opacity="0" />
                         <stop offset="${percent + 1}%" stop-color="#fff" stop-opacity="1" />
@@ -61,7 +63,7 @@ class Star {
     getSpecificStar(percent) {
         return this._getSVG({
             fillStrocke: "url(#grad-full)",
-            fillFront: "url(#grad-specific)",
+            fillFront: `url(#grad-specific_${this.timestamp})`,
             fillBack: "url(#grad-full)",
             percent
         });
