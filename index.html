@@ -14,6 +14,7 @@
 
     <main class="flex-center">
         <div id="rating-wrapper" class="rating-wrapper"></div>
+        <div id="rating-wrapper-2" class="rating-wrapper"></div>
         <div id="display" class="digits">Rating</div>
         <button id="change-mode-btn" class="change-mode-btn" type="button">Change Mode</button>
     </main>
@@ -21,15 +22,46 @@
     <script src="./star-rating.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const { getRating, getEditMode, setEditMode } = defineStarRating({
-                stars: 5,
-                rating: 2.5,
-                size: 80,
-                gap: 0,
-                editMode: false,
-                ratingSelector: "#rating-wrapper",
-                displaySelector: "#display",
-            });
+            // const star = defineStarRating({
+            //     stars: 5,
+            //     rating: 2.5,
+            //     size: 80,
+            //     gap: 0,
+            //     editMode: false,
+            //     ratingSelector: "#rating-wrapper",
+            //     displaySelector: "#display",
+            //     responsive: [
+            //         {
+            //             breakpoint: 1200,
+            //             settings: {
+            //                 size: 50,
+            //             }
+            //         }
+            //     ]
+            // })
+            // console.log(star);
+            {
+                const { getRating, getEditMode, setEditMode } = defineStarRating({
+                    stars: 5,
+                    rating: 2.5,
+                    size: 80,
+                    gap: 0,
+                    editMode: true,
+                    ratingSelector: "#rating-wrapper",
+                });
+            }
+
+            {
+                const { getRating, getEditMode, setEditMode } = defineStarRating({
+                    stars: 5,
+                    rating: 3.5,
+                    size: 80,
+                    gap: 0,
+                    editMode: false,
+                    ratingSelector: "#rating-wrapper-2",
+                });
+            }
+
 
             const button = document.getElementById("change-mode-btn");
             button.addEventListener("click", () => setEditMode(!getEditMode()));
